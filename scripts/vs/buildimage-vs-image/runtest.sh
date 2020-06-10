@@ -19,18 +19,50 @@ run_pytest()
     done
 }
 
+( # START OF CRITICAL SECTION
+
+# NOTE: Jenkins currently limits each worker to 2 KVM jobs at once. So, we only need
+# one lock to maintain consistency. The logic is:
+#
+# - If we are able to grab the lock, then vms-kvm-t0 is not in use. So, we are free
+#   to use this testbed, regardless of whether vms-kvm-t0-2 is currently being used
+#   or not.
+#
+# - If we are not able to grab the lock, then vms-kvm-t0 is in use. Since we are limited
+#   to 2 jobs per node, that means vms-kvm-t0-2 is not currently in use, so we are free
+#   to use that testbed.
+#
+# This logic may need to be refined as we add more testbeds, but it should work for now.
+TESTBED_1_LOCK_HELD=0
+flock -xn 200 || TESTBED_1_LOCK_HELD=$?
+
+if [ $TESTBED_1_LOCK_HELD -eq 0 ] ; then
+    testbed_name="vms-kvm-t0"
+else
+    testbed_name="vms-kvm-t0-2"
+fi
+
+# TODO: There are some improvements we could make to this script.
+#
+# 1. We should take advantage of the markers in sonic-mgmt to control the test selection.
+#    Currently the test cases are hardcoded in this file which makes it difficult to pilot
+#    new test cases for the PR runners. If we use markers then we can open PRs against sonic-mgmt
+#    to add new test cases and limit the blast radius to the test run for that particular PR.
+#
+# 2. This script can probably be modularized a bit better to help with readability.
+
 cd $HOME
 mkdir -p .ssh
 cp /data/pkey.txt .ssh/id_rsa
 chmod 600 .ssh/id_rsa
 
-# Refresh virtual switch with vms-kvm-t0 topology
+# Refresh virtual switch with testbed topology
 cd /data/sonic-mgmt/ansible
-./testbed-cli.sh -m veos.vtb -t vtestbed.csv refresh-dut vms-kvm-t0 password.txt
+./testbed-cli.sh -m veos.vtb -t vtestbed.csv refresh-dut $testbed_name password.txt
 sleep 120
 
 # Create and deploy default vlan configuration (one_vlan_a) to the virtual switch
-./testbed-cli.sh -m veos.vtb -t vtestbed.csv deploy-mg vms-kvm-t0 lab password.txt
+./testbed-cli.sh -m veos.vtb -t vtestbed.csv deploy-mg $testbed_name lab password.txt
 sleep 180
 
 export ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible/library/
@@ -43,7 +75,7 @@ PYTEST_COMMON_OPTS="--inventory veos.vtb \
                     --user admin \
                     -vvv \
                     --show-capture stdout \
-                    --testbed vms-kvm-t0 \
+                    --testbed $testbed_name \
                     --testbed_file vtestbed.csv \
                     --disable_loganalyzer \
                     --log-file-level debug"
@@ -87,7 +119,7 @@ popd
 
 # Create and deploy two vlan configuration (two_vlan_a) to the virtual switch
 cd /data/sonic-mgmt/ansible
-./testbed-cli.sh -m veos.vtb -t vtestbed.csv deploy-mg vms-kvm-t0 lab password.txt -e vlan_config=two_vlan_a
+./testbed-cli.sh -m veos.vtb -t vtestbed.csv deploy-mg $testbed_name lab password.txt -e vlan_config=two_vlan_a
 sleep 180
 
 # Tests to run using two vlan configuration
@@ -100,3 +132,5 @@ tests="\
 pushd /data/sonic-mgmt/tests
 run_pytest $tgname $tests
 popd
+
+) 200>/var/lock/kvm_lock # END OF CRITICAL SECTION
