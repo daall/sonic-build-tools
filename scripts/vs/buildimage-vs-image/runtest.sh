@@ -1,5 +1,14 @@
 #!/bin/bash -xe
 
+# TODO: There are some improvements we could make to this script.
+#
+# 1. We should take advantage of the markers in sonic-mgmt to control the test selection.
+#    Currently the test cases are hardcoded in this file which makes it difficult to pilot
+#    new test cases for the PR runners. If we use markers then we can open PRs against sonic-mgmt
+#    to add new test cases and limit the blast radius to the test run for that particular PR.
+#
+# 2. This script can probably be modularized a bit better to help with readability.
+
 run_pytest()
 {
     tgname=$1
@@ -41,15 +50,6 @@ if [ $TESTBED_1_LOCK_HELD -eq 0 ] ; then
 else
     testbed_name="vms-kvm-t0-2"
 fi
-
-# TODO: There are some improvements we could make to this script.
-#
-# 1. We should take advantage of the markers in sonic-mgmt to control the test selection.
-#    Currently the test cases are hardcoded in this file which makes it difficult to pilot
-#    new test cases for the PR runners. If we use markers then we can open PRs against sonic-mgmt
-#    to add new test cases and limit the blast radius to the test run for that particular PR.
-#
-# 2. This script can probably be modularized a bit better to help with readability.
 
 cd $HOME
 mkdir -p .ssh
