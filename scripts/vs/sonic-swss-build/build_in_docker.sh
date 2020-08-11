@@ -15,12 +15,9 @@ sudo dpkg -i buildimage/target/debs/buster/libnl-nf-3-dev_*.deb
 sudo dpkg -i buildimage/target/debs/buster/libnl-cli-3-200_*.deb
 sudo dpkg -i buildimage/target/debs/buster/libnl-cli-3-dev_*.deb
 
-# Install libteam
-sudo apt-get install -y libdbus-1-3
-sudo dpkg -i buildimage/target/debs/buster/libteam5_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libteamdctl0_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libteam-utils_*.deb
-sudo dpkg -i buildimage/target/debs/buster/libteam-dev_*.deb
+# Install common library
+sudo dpkg -i common/libswsscommon_*.deb
+sudo dpkg -i common/libswsscommon-dev_*.deb
 
 # Install SAIVS
 sudo dpkg -i sairedis/libsaivs_*.deb
@@ -31,9 +28,12 @@ sudo dpkg -i sairedis/libsaimetadata_*.deb
 sudo dpkg -i sairedis/libsaimetadata-dev_*.deb
 sudo dpkg -i sairedis/syncd-vs_*.deb
 
-# Install common library
-sudo dpkg -i common/libswsscommon_*.deb
-sudo dpkg -i common/libswsscommon-dev_*.deb
+# Install libteam
+sudo apt-get install -y libdbus-1-3
+sudo dpkg -i buildimage/target/debs/buster/libteam5_*.deb
+sudo dpkg -i buildimage/target/debs/buster/libteamdctl0_*.deb
+sudo dpkg -i buildimage/target/debs/buster/libteam-utils_*.deb
+sudo dpkg -i buildimage/target/debs/buster/libteam-dev_*.deb
 
 pushd swss
 
