@@ -59,6 +59,12 @@ pipeline {
                     sh './scripts/vs/sonic-swss-build/test.sh'
                 }
             }
+
+            post {
+                unstable {
+                    archiveArtifacts(artifacts: 'buildimage/target/docker-sonic-vs.gz, **/*.log, target/var/log/*, swss/tests/log/**')
+                }
+            }
         }
     }
 
@@ -67,10 +73,6 @@ pipeline {
             archiveArtifacts(artifacts: 'target/*swsscommon*.deb, swss/tests/tr.xml')
             junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'swss/tests/tr.xml')
             cleanWs(disableDeferredWipeout: false, deleteDirs: true, notFailBuild: true)
-        }
-
-        failure {
-            archiveArtifacts(artifacts: 'buildimage/target/docker-sonic-vs.gz, **/*.log, target/var/log/*, swss/tests/log/**')
         }
     }
 }
