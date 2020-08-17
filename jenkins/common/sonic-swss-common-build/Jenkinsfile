@@ -61,7 +61,7 @@ pipeline {
             }
 
             post {
-                unstable {
+                always {
                     archiveArtifacts(artifacts: 'buildimage/target/docker-sonic-vs.gz, **/*.log, target/var/log/*, swss/tests/log/**')
                 }
             }
