@@ -8,7 +8,6 @@ docker run --rm=true --privileged -v $(pwd):/sonic -w /sonic -i sonicdev-microso
 
 mkdir -p scripts/vs/sonic-swss-build/debs
 cp *.deb scripts/vs/sonic-swss-build/debs
-cp sairedis/*.deb scripts/vs/sonic-swss-build/debs
 cp common/*.deb scripts/vs/sonic-swss-build/debs
 cp utilities/*.deb scripts/vs/sonic-swss-build/debs
 
