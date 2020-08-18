@@ -18,8 +18,8 @@ pipeline {
             steps {
                 dir('sonic-swss-common') {
                     checkout([$class: 'GitSCM',
-                              branches: [[name: 'refs/heads/master']],
-                              userRemoteConfigs: [[url: 'http://github.com/Azure/sonic-swss-common']]])
+                              branches: [[name: 'refs/heads/db_connect_NS']],
+                              userRemoteConfigs: [[url: 'http://github.com/judyjoseph/sonic-swss-common']]])
                 }
             }
         }
