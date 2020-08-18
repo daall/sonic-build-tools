@@ -25,7 +25,7 @@ pipeline {
                               branches: [[name: '*/master']],
                               userRemoteConfigs: [[url: 'https://github.com/Azure/sonic-swss']]])
                 }
-                copyArtifacts(projectName: 'common/sonic-swss-common-build', filter: '**/*.deb', target: 'common', flatten: true)
+                copyArtifacts(projectName: 'common/jenkins_testing/swss-test', filter: '**/*.deb', target: 'common', flatten: true, selector: specific("24"))
                 copyArtifacts(projectName: 'vs/buildimage-vs-all', filter: '**/*.deb,**/docker-sonic-vs.gz', target: 'buildimage', flatten: false)
             }
         }
